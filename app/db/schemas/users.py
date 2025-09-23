@@ -9,7 +9,6 @@ class UsersBase(BaseModel):
     group: str
     gender: str
     userType: str
-    userImg: str
     class Config:
         orm_mode = True
 
