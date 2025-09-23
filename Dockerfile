@@ -5,6 +5,7 @@ FROM python:3.12
 # 'g++' is needed for packages like ujson.
 RUN apt-get update && apt-get install -y \
     gcc \
+    g++ \
     libffi-dev \
 
 # Set the working directory inside the container
