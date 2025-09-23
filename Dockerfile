@@ -1,14 +1,11 @@
 # Use a Python base image with a specific version
-FROM python:3.12-slim
+FROM python:3.12
 
 # Install system dependencies required for C/C++-based Python packages.
 # 'g++' is needed for packages like ujson.
 RUN apt-get update && apt-get install -y \
     gcc \
-    g++ \
     libffi-dev \
-    # Clean up the cache to keep the image size small
-    && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory inside the container
 WORKDIR /app
