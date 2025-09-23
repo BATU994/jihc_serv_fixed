@@ -14,6 +14,7 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install the Python dependencies
+RUN pip install wheel
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of your application code
