@@ -43,7 +43,6 @@ class Users(Base):
     group = sa.Column(sa.Text, nullable=True)
     gender = sa.Column(sa.Text, nullable=True)
     userType = sa.Column(sa.Text, nullable=True)
-    userImg = sa.Column(sa.Text, nullable=True)
     creation_date = sa.Column(sa.DateTime, server_default=sa.func.now(), nullable=False)  # type: ignore
 
 
