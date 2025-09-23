@@ -40,7 +40,6 @@ async def register_user(
         group=payload.group,
         gender=payload.gender,
         userType=payload.userType,
-        userImg=payload.userImg,
     )
     db.add(user)
     await db.commit()
