@@ -26,6 +26,16 @@ async def get_users(
 
     if not users:
         raise HTTPException(status_code=404, detail="No users found")
+    # Convert creation_date from datetime to date for each user
+    users_out = []
+    for user in users:
+        if hasattr(user, "creation_date") and user.creation_date is not None:
+            # Defensive: only convert if it's a datetime
+            try:
+                user.creation_date = user.creation_date.date()
+            except Exception:
+                pass
+        users_out.append(user)
     return users
 
 
