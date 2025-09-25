@@ -77,7 +77,7 @@ async def login(
     return {
         "access_token": create_access_token(jwt_data),
         "refresh_token": create_refresh_token(jwt_data),
-        "userId": user.id,
+        "userId": "dummy",
         "userName": user.name,
         "userType": user.userType,
         "email": user.email,
