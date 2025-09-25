@@ -56,9 +56,6 @@ async def login(
     payload: LoginRequest,
     db: AsyncSession = Depends(sessions.get_async_session),
 ):
-    # The name "username" must be used according to the OAuth spec but it containts
-    # the users email address. Up to the frontend to implement this
-    # See here: https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/#get-the-username-and-password
     q = await db.scalars(select(Users).filter(Users.email == payload.email))
     user = q.first()
 
@@ -68,7 +65,7 @@ async def login(
             detail="Incorrect email or password",
         )
 
-   hashed_pass = user.password
+    hashed_pass = user.password
     if not verify_password(payload.password, hashed_pass):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
