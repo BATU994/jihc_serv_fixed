@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
+from app.db.schemas.auth import LoginRequest
 from sqlalchemy import select
 from app.db import sessions
 from app.db.models import Users
@@ -53,13 +53,13 @@ async def register_user(
     response_model=auth_schemas.Token,
 )
 async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    payload: LoginRequest,
     db: AsyncSession = Depends(sessions.get_async_session),
 ):
     # The name "username" must be used according to the OAuth spec but it containts
     # the users email address. Up to the frontend to implement this
     # See here: https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/#get-the-username-and-password
-    q = await db.scalars(select(Users).filter(Users.email == form_data.username))
+    q = await db.scalars(select(Users).filter(Users.email == payload.email))
     user = q.first()
 
     if user is None:
@@ -68,8 +68,8 @@ async def login(
             detail="Incorrect email or password",
         )
 
-    hashed_pass = user.password 
-    if not verify_password(form_data.password, hashed_pass):
+   hashed_pass = user.password
+    if not verify_password(payload.password, hashed_pass):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect email or password",
