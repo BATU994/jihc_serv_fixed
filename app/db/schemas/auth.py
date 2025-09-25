@@ -12,6 +12,7 @@ class Token(BaseModel):
     userName: str
     userType: str
     email: str
+    group: str
 
 
 
