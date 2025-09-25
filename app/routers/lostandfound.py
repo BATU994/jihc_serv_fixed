@@ -8,8 +8,7 @@ from app.deps import get_current_user
 
 router = APIRouter(
     prefix="/lostandfound",
-    tags=["lostandfound"],
-    dependencies=[Depends(get_current_user)]
+    tags=["lostandfound"]
 )
 
 
