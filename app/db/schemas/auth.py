@@ -8,6 +8,11 @@ class LoginRequest(BaseModel):
 class Token(BaseModel):
     access_token: str
     refresh_token: str
+    userId: int
+    userName: str
+    userType: str
+    email: str
+
 
 
 class TokenData(BaseModel):
