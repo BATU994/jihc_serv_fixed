@@ -81,4 +81,5 @@ async def login(
         "userName": user.name,
         "userType": user.userType,
         "email": user.email,
+        "group": user.group
     }
