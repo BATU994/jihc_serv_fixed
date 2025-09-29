@@ -83,7 +83,7 @@ async def get_chats(db: AsyncSession = Depends(get_async_session), user_id: int 
     return await get_chats_for_user(db, user_id)
 
 @router.get("/user/{user_id}", response_model=List[Chat])
-async def get_chats_by_user(user_id: str, db: AsyncSession = Depends(get_async_session), _: int = Depends(get_current_user)):
+async def get_chats_by_user(user_id: int, db: AsyncSession = Depends(get_async_session), _: int = Depends(get_current_user)):
     # Return only chats that include the provided user_id
     return await get_chats_for_user(db, user_id)
 
