@@ -38,6 +38,7 @@ class Users(Base):
     __tablename__ = "users"
 
     id = sa.Column(sa.Integer, primary_key=True, index=True)
+    user_uuid = sa.Column(sa.Text, nullable=False, unique=True, default=lambda: uuid4().hex)
     email = sa.Column(sa.Text, nullable=False, unique=True)
     password = sa.Column(sa.Text, nullable=False)
     name = sa.Column(sa.Text, nullable=False)
