@@ -19,6 +19,7 @@ from fastapi.responses import FileResponse
 
 @router.post("/", response_model=lostandfound_schema.LostAndFound)
 async def create_lostandfound(
+    userId: str = Form(...),
     item_name: str = Form(...),
     isLost: bool = Form(...),
     desc: str = Form(...),
@@ -39,8 +40,6 @@ async def create_lostandfound(
         with open(file_path, "wb") as f:
             f.write(await image.read())
         image_path = f"/static/lostandfound/{filename}"
-    # Generate random userId for the item
-    userId = uuid4().hex
     item = LostAndFound(
         userId=userId,
         item_name=item_name,
