@@ -9,8 +9,8 @@ class LostAndFound(Base):
     __tablename__ = "lostandfound"
 
     id = sa.Column(sa.Integer, primary_key=True, index=True)
-    item_id = sa.Column(sa.Text, nullable=False, unique=True, default=lambda: uuid4().hex)
-    userId = sa.Column(sa.Text, nullable=False)
+    item_id = sa.Column(sa.Integer, nullable=False, unique=True, default=lambda: uuid4().hex)
+    userId = sa.Column(sa.Integer, nullable=False)
     item_name = sa.Column(sa.Text, nullable=False)
     isLost = sa.Column(sa.Boolean, nullable=False, server_default=sa.text('0'))
     desc = sa.Column(sa.Text, nullable=False)
