@@ -19,4 +19,5 @@ class UsersCreate(UsersBase):
 
 class Users(UsersBase):
     id: int
+    user_uuid: str
     creation_date: date
