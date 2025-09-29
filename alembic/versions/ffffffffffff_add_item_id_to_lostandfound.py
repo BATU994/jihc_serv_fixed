@@ -2,7 +2,7 @@
 add item_id to lostandfound
 
 Revision ID: ffffffffffff
-Revises: 132b05711f2f
+Revises:  c8fb3fdaeec5
 Create Date: 2025-09-29
 """
 
@@ -12,7 +12,7 @@ from uuid import uuid4
 
 # revision identifiers, used by Alembic.
 revision = 'ffffffffffff'
-down_revision = '132b05711f2f'
+down_revision = 'c8fb3fdaeec5'
 branch_labels = None
 depends_on = None
 
