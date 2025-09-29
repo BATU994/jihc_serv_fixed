@@ -2,12 +2,14 @@ import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
 from .sessions import Base
+from uuid import uuid4
 
 # LostAndFound model for lost and found items
 class LostAndFound(Base):
     __tablename__ = "lostandfound"
 
     id = sa.Column(sa.Integer, primary_key=True, index=True)
+    item_id = sa.Column(sa.Text, nullable=False, unique=True, default=lambda: uuid4().hex)
     userId = sa.Column(sa.Text, nullable=False)
     item_name = sa.Column(sa.Text, nullable=False)
     isLost = sa.Column(sa.Boolean, nullable=False, server_default=sa.text('0'))
