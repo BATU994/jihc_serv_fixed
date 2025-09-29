@@ -16,5 +16,6 @@ class LostAndFoundCreate(LostAndFoundBase):
 
 class LostAndFound(LostAndFoundBase):
     id: int
+    item_id: str
     class Config:
         orm_mode = True

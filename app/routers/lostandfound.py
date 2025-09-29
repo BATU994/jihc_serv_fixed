@@ -19,7 +19,6 @@ from fastapi.responses import FileResponse
 
 @router.post("/", response_model=lostandfound_schema.LostAndFound)
 async def create_lostandfound(
-    userId: str = Form(...),
     item_name: str = Form(...),
     isLost: bool = Form(...),
     desc: str = Form(...),
@@ -40,6 +39,8 @@ async def create_lostandfound(
         with open(file_path, "wb") as f:
             f.write(await image.read())
         image_path = f"/static/lostandfound/{filename}"
+    # Generate random userId for the item
+    userId = uuid4().hex
     item = LostAndFound(
         userId=userId,
         item_name=item_name,
@@ -61,8 +62,8 @@ async def get_all_lostandfound(db: AsyncSession = Depends(sessions.get_async_ses
     return result.scalars().all()
 
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_lostandfound(item_id: int, db: AsyncSession = Depends(sessions.get_async_session)):
-    result = await db.execute(select(LostAndFound).filter(LostAndFound.id == item_id))
+async def delete_lostandfound(item_id: str, db: AsyncSession = Depends(sessions.get_async_session)):
+    result = await db.execute(select(LostAndFound).filter(LostAndFound.item_id == item_id))
     item = result.scalar_one_or_none()
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
