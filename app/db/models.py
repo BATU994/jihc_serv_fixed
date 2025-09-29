@@ -1,4 +1,3 @@
-
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
@@ -44,6 +43,14 @@ class Users(Base):
     gender = sa.Column(sa.Text, nullable=True)
     userType = sa.Column(sa.Text, nullable=True)
     creation_date = sa.Column(sa.DateTime, server_default=sa.func.now(), nullable=False)  # type: ignore
+
+
+class Chat(Base):
+    __tablename__ = "chats"
+    id = sa.Column(sa.Integer, primary_key=True, index=True)
+    # For simplicity, store user ids as comma-separated string
+    user_ids = sa.Column(sa.Text, nullable=False)  # e.g. "1,2,3"
+    created_at = sa.Column(sa.DateTime, server_default=sa.func.now(), nullable=False)
 
 
 
