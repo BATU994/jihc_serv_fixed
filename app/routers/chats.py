@@ -14,9 +14,17 @@ def get_current_user():
     return 1
 
 async def get_chats_for_user(db: AsyncSession, user_id: int):
-    # Find chats where user_id is in user_ids
+    # Find chats where user_id is present as a distinct token in comma-separated list
+    uid = str(user_id)
     result = await db.execute(
-        select(DBChat).filter(DBChat.user_ids.like(f"%{user_id}%"))
+        select(DBChat).filter(
+            or_(
+                DBChat.user_ids == uid,
+                DBChat.user_ids.like(f"{uid},%"),
+                DBChat.user_ids.like(f"%,{uid},%"),
+                DBChat.user_ids.like(f"%,{uid}")
+            )
+        )
     )
     return result.scalars().all()
 
@@ -72,6 +80,11 @@ async def send_message(db: AsyncSession, chat_id: int, sender_id: int, content: 
 
 @router.get("/", response_model=List[Chat])
 async def get_chats(db: AsyncSession = Depends(get_async_session), user_id: int = Depends(get_current_user)):
+    return await get_chats_for_user(db, user_id)
+
+@router.get("/user/{user_id}", response_model=List[Chat])
+async def get_chats_by_user(user_id: int, db: AsyncSession = Depends(get_async_session), _: int = Depends(get_current_user)):
+    # Return only chats that include the provided user_id
     return await get_chats_for_user(db, user_id)
 
 @router.get("/{chat_id}/messages", response_model=List[Message])
