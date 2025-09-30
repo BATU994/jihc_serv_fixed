@@ -60,7 +60,6 @@ async def get_user(
 
 @router.get("/get/user/{id}/name")
 async def get_user(
-    current_user: auth_user_dependency,
     id: int,
     db: AsyncSession = Depends(sessions.get_async_session),
 ) -> user_schemas.Users | dict:

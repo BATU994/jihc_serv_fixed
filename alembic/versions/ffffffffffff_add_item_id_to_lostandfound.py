@@ -33,6 +33,9 @@ def upgrade() -> None:
         conn.execute(sa.text("UPDATE lostandfound SET item_id=:iid WHERE id=:id"), {"iid": uuid4().hex, "id": row_id})
     # Create a unique index on item_id (works in SQLite)
     op.create_index('uq_lostandfound_item_id', 'lostandfound', ['item_id'], unique=True)
+    # Now set NOT NULL in a batch operation (SQLite-compatible)
+    with op.batch_alter_table('lostandfound') as batch_op:
+        batch_op.alter_column('item_id', existing_type=sa.Text(), nullable=False)
 
 
 def downgrade() -> None:
