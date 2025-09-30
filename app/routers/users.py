@@ -45,14 +45,11 @@ async def get_user(
     id: int,
     db: AsyncSession = Depends(sessions.get_async_session),
 ) -> user_schemas.Users | dict:
-    # Construct the query, in this case a scaler since we expect a single value
-    # and don't need a tuple
     q = await db.scalars(select(Users).filter(Users.id == id))
     user = q.first()
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    # Convert creation_date from datetime to date
     if hasattr(user, "creation_date") and user.creation_date is not None:
         try:
             user.creation_date = user.creation_date.date()
@@ -61,7 +58,17 @@ async def get_user(
     return user
 
 
-# TODO: Add unit tests
+@router.get("/get/user/{id}/name")
+async def get_user(
+    current_user: auth_user_dependency,
+    id: int,
+    db: AsyncSession = Depends(sessions.get_async_session),
+) -> user_schemas.Users | dict:
+    q = await db.scalars(select(Users).filter(Users.id == id))
+    user = q.first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"full_name": user.name}
 @router.delete("/delete/user/{id}")
 async def delete_user(
     current_user: auth_user_dependency,

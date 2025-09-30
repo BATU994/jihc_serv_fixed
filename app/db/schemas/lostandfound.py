@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 class LostAndFoundBase(BaseModel):
-    userId: str
+    userId: int
     item_name: str
     isLost: bool
     desc: str
@@ -16,6 +16,6 @@ class LostAndFoundCreate(LostAndFoundBase):
 
 class LostAndFound(LostAndFoundBase):
     id: int
-    item_id: str
+    item_id: int
     class Config:
         orm_mode = True
