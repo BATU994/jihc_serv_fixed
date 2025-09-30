@@ -19,7 +19,7 @@ from fastapi.responses import FileResponse
 
 @router.post("/", response_model=lostandfound_schema.LostAndFound)
 async def create_lostandfound(
-    userId: str = Form(...),
+    userId: int = Form(...),
     item_name: str = Form(...),
     isLost: bool = Form(...),
     desc: str = Form(...),
