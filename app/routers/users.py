@@ -69,6 +69,7 @@ async def get_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return {"full_name": user.name}
+
 @router.delete("/delete/user/{id}")
 async def delete_user(
     current_user: auth_user_dependency,
