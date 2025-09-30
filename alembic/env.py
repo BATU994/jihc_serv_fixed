@@ -57,7 +57,13 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata)
+    url = getenv("DATABASE_URL", "sqlite+aiosqlite:////app/sql_app.db")
+    is_sqlite = url.startswith("sqlite+")
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        render_as_batch=is_sqlite,
+    )
 
     with context.begin_transaction():
         context.run_migrations()

@@ -60,6 +60,27 @@ async def get_all_lostandfound(db: AsyncSession = Depends(sessions.get_async_ses
     result = await db.execute(select(LostAndFound))
     return result.scalars().all()
 
+@router.get("/{item_id}", response_model=lostandfound_schema.LostAndFound)
+async def get_lostandfound(item_id: str, db: AsyncSession = Depends(sessions.get_async_session)):
+    result = await db.execute(select(LostAndFound).filter(LostAndFound.item_id == item_id))
+    item = result.scalar_one_or_none()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return item
+
+@router.get("/{item_id}", response_model=lostandfound_schema.LostAndFound)
+async def get_lostandfound(item_id: str, updated_item: lostandfound_schema.LostAndFound, db: AsyncSession = Depends(sessions.get_async_session)):
+    result = await db.execute(select(LostAndFound).filter(LostAndFound.item_id == item_id))
+    item = result.scalar_one_or_none()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+    for key, value in updated_item.dict(exclude_unset=True).items():
+        if key != "item_id":
+            item[key] = value
+    await db.commit()
+    await db.refresh(item)
+
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_lostandfound(item_id: str, db: AsyncSession = Depends(sessions.get_async_session)):
     result = await db.execute(select(LostAndFound).filter(LostAndFound.item_id == item_id))
