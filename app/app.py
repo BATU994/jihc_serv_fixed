@@ -14,17 +14,28 @@ def create_app() -> FastAPI:
     from app.routers import lostandfound
     app.include_router(lostandfound.router)
     app.include_router(chats.router)
-    origins = [
-        "http://localhost:3000",
-    ]
+    import os
+    # Allow overriding CORS origins via env var: ALLOWED_ORIGINS=url1,url2
+    env_origins = os.getenv("ALLOWED_ORIGINS", "")
+    origins = [o.strip() for o in env_origins.split(",") if o.strip()]
 
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    if origins:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+    else:
+        # Default: allow Firebase Hosting domains and localhost dev ports
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origin_regex=r"https://.*\\.web\\.app$|https://.*\\.firebaseapp\\.com$|http://localhost(:\\d+)?$",
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
     # Generic health route to sanity check the API
     @app.get("/health")
