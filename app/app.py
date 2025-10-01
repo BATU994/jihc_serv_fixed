@@ -17,7 +17,7 @@ def create_app() -> FastAPI:
     import os
     # Allow overriding CORS origins via env var: ALLOWED_ORIGINS=url1,url2
     env_origins = os.getenv("ALLOWED_ORIGINS", "")
-    origins = [o.strip() for o in env_origins.split(",") if o.strip()]
+    origins = ["https://jihc-lostandfound.web.app"]
 
     if origins:
         app.add_middleware(
