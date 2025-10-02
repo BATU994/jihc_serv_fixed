@@ -18,6 +18,7 @@ from uuid import uuid4
 from fastapi.responses import FileResponse
 
 @router.post("/", response_model=lostandfound_schema.LostAndFound)
+@router.post("", response_model=lostandfound_schema.LostAndFound)
 async def create_lostandfound(
     userId: int = Form(...),
     item_name: str = Form(...),
