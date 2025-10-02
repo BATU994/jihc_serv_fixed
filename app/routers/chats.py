@@ -79,19 +79,23 @@ async def send_message(db: AsyncSession, chat_id: int, sender_id: int, content: 
     return messages[0] if messages else None
 
 @router.get("/", response_model=List[Chat])
+@router.get("", response_model=List[Chat])
 async def get_chats(db: AsyncSession = Depends(get_async_session), user_id: int = Depends(get_current_user)):
     return await get_chats_for_user(db, user_id)
 
 @router.get("/user/{user_id}", response_model=List[Chat])
+@router.get("/user/{user_id}/", response_model=List[Chat])
 async def get_chats_by_user(user_id: int, db: AsyncSession = Depends(get_async_session), _: int = Depends(get_current_user)):
     # Return only chats that include the provided user_id
     return await get_chats_for_user(db, user_id)
 
 @router.get("/{chat_id}/messages", response_model=List[Message])
+@router.get("/{chat_id}/messages/", response_model=List[Message])
 async def get_chat_messages(chat_id: int, db: AsyncSession = Depends(get_async_session), user_id: int = Depends(get_current_user)):
     return await get_messages_for_chat(db, chat_id)
 
 @router.post("/{chat_id}/messages", response_model=Message)
+@router.post("/{chat_id}/messages/", response_model=Message)
 async def send_message_endpoint(chat_id: int, message: MessageCreate, db: AsyncSession = Depends(get_async_session), user_id: int = Depends(get_current_user)):
     msg = await send_message(db, chat_id, user_id, message.content)
     if not msg:
@@ -99,6 +103,7 @@ async def send_message_endpoint(chat_id: int, message: MessageCreate, db: AsyncS
     return msg
 
 @router.post("/", response_model=Chat)
+@router.post("", response_model=Chat)
 async def create_chat_endpoint(chat: ChatCreate, db: AsyncSession = Depends(get_async_session), user_id: int = Depends(get_current_user)):
     # Accept exactly two distinct user IDs directly
     ids = list(dict.fromkeys(chat.user_ids))
