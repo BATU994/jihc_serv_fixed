@@ -19,23 +19,15 @@ def create_app() -> FastAPI:
     env_origins = os.getenv("ALLOWED_ORIGINS", "")
     origins = ["https://jihc-lostandfound.web.app"]
 
-    if origins:
-        app.add_middleware(
-            CORSMiddleware,
-            allow_origins=origins,
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
-        )
-    else:
-        # Default: allow Firebase Hosting domains and localhost dev ports
-        app.add_middleware(
-            CORSMiddleware,
-            allow_origin_regex=r"https://.*\\.web\\.app$|https://.*\\.firebaseapp\\.com$|http://localhost(:\\d+)?$",
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
-        )
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
 
     # Generic health route to sanity check the API
     @app.get("/health")
