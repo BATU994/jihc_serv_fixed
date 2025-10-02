@@ -5,13 +5,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from app.routers import users, auth, chats
 import os
 
-class CSPMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request, call_next):
-        response = await call_next(request)
-        response.headers["Content-Security-Policy"] = "upgrade-insecure-requests"
-        return response
-
-
 def create_app() -> FastAPI:
     app = FastAPI(title="Fastapi Template")
     from fastapi.staticfiles import StaticFiles
@@ -24,7 +17,6 @@ def create_app() -> FastAPI:
     app.include_router(chats.router)
     env_origins = os.getenv("ALLOWED_ORIGINS", "")
     origins = ["https://jihc-7777.web.app"]
-    app.add_middleware(CSPMiddleware)
 
     app.add_middleware(
         CORSMiddleware,
