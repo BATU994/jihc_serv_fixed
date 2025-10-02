@@ -23,7 +23,7 @@ def create_app() -> FastAPI:
     app.include_router(lostandfound.router)
     app.include_router(chats.router)
     env_origins = os.getenv("ALLOWED_ORIGINS", "")
-    origins = ["https://jihc-lostandfound.web.app"]
+    origins = ["https://jihc-7777.web.app"]
     app.add_middleware(CSPMiddleware)
 
     app.add_middleware(
