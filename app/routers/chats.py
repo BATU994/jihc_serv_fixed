@@ -79,6 +79,7 @@ async def send_message(db: AsyncSession, chat_id: int, sender_id: int, content: 
     return messages[0] if messages else None
 
 @router.get("/", response_model=List[Chat])
+@router.get("", response_model=List[Chat])
 async def get_chats(db: AsyncSession = Depends(get_async_session), user_id: int = Depends(get_current_user)):
     return await get_chats_for_user(db, user_id)
 
@@ -99,6 +100,7 @@ async def send_message_endpoint(chat_id: int, message: MessageCreate, db: AsyncS
     return msg
 
 @router.post("/", response_model=Chat)
+@router.post("", response_model=Chat)
 async def create_chat_endpoint(chat: ChatCreate, db: AsyncSession = Depends(get_async_session), user_id: int = Depends(get_current_user)):
     # Accept exactly two distinct user IDs directly
     ids = list(dict.fromkeys(chat.user_ids))
