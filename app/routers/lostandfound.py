@@ -60,6 +60,11 @@ async def get_all_lostandfound(db: AsyncSession = Depends(sessions.get_async_ses
     result = await db.execute(select(LostAndFound))
     return result.scalars().all()
 
+# Handle no-trailing-slash to avoid proxy redirect loops
+@router.get("", response_model=list[lostandfound_schema.LostAndFound])
+async def get_all_lostandfound_no_slash(db: AsyncSession = Depends(sessions.get_async_session)):
+    return await get_all_lostandfound(db)
+
 @router.get("/{item_id}", response_model=lostandfound_schema.LostAndFound)
 async def get_lostandfound(item_id: str, db: AsyncSession = Depends(sessions.get_async_session)):
     result = await db.execute(select(LostAndFound).filter(LostAndFound.item_id == item_id))
@@ -68,18 +73,25 @@ async def get_lostandfound(item_id: str, db: AsyncSession = Depends(sessions.get
         raise HTTPException(status_code=404, detail="Item not found")
     return item
 
-@router.get("/{item_id}", response_model=lostandfound_schema.LostAndFound)
-async def get_lostandfound(item_id: str, updated_item: lostandfound_schema.LostAndFound, db: AsyncSession = Depends(sessions.get_async_session)):
+@router.put("/{item_id}", response_model=lostandfound_schema.LostAndFound)
+async def update_lostandfound(
+    item_id: str,
+    updated_item: lostandfound_schema.LostAndFoundBase,
+    db: AsyncSession = Depends(sessions.get_async_session),
+):
     result = await db.execute(select(LostAndFound).filter(LostAndFound.item_id == item_id))
     item = result.scalar_one_or_none()
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
-    
-    for key, value in updated_item.dict(exclude_unset=True).items():
-        if key != "item_id":
-            item[key] = value
+
+    data = updated_item.model_dump(exclude_unset=True)
+    # Do not allow changing item_id
+    data.pop("item_id", None)
+    for key, value in data.items():
+        setattr(item, key, value)
     await db.commit()
     await db.refresh(item)
+    return item
 
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_lostandfound(item_id: str, db: AsyncSession = Depends(sessions.get_async_session)):
