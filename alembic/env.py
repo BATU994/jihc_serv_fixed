@@ -44,7 +44,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = getenv("DATABASE_URL", "sqlite+aiosqlite:////app/sql_app.db")
+    url = getenv("DATABASE_URL", "sqlite+aiosqlite:///./sql_app.db")
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -57,7 +57,7 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    url = getenv("DATABASE_URL", "sqlite+aiosqlite:////app/sql_app.db")
+    url = getenv("DATABASE_URL", "sqlite+aiosqlite:///./sql_app.db")
     is_sqlite = url.startswith("sqlite+")
     context.configure(
         connection=connection,
@@ -75,7 +75,7 @@ async def run_async_migrations() -> None:
 
     """
     config.set_main_option(
-        "sqlalchemy.url", getenv("DATABASE_URL", "sqlite+aiosqlite:////app/sql_app.db")
+        "sqlalchemy.url", getenv("DATABASE_URL", "sqlite+aiosqlite:///./sql_app.db")
     )
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),

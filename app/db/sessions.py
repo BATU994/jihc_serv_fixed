@@ -11,8 +11,8 @@ from typing import Any, AsyncGenerator
 from asyncio import current_task
 
 
-# Use absolute path in container so Alembic and app share the same DB file
-SQLALCHEMY_DATABASE_URL = getenv("DATABASE_URL", "sqlite+aiosqlite:////app/sql_app.db")
+# Default to a local SQLite file; override with DATABASE_URL in prod/containers
+SQLALCHEMY_DATABASE_URL = getenv("DATABASE_URL", "sqlite+aiosqlite:///./sql_app.db")
 
 async_engine = create_async_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}

@@ -6,13 +6,6 @@ from starlette.middleware.proxy_headers import ProxyHeadersMiddleware
 from app.routers import users, auth, chats
 import os
 
-class CSPMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request, call_next):
-        response = await call_next(request)
-        response.headers["Content-Security-Policy"] = "upgrade-insecure-requests"
-        return response
-
-
 def create_app() -> FastAPI:
     app = FastAPI(title="Fastapi Template")
     from fastapi.staticfiles import StaticFiles
@@ -24,6 +17,7 @@ def create_app() -> FastAPI:
     app.include_router(lostandfound.router)
     app.include_router(chats.router)
     env_origins = os.getenv("ALLOWED_ORIGINS", "")
+
     origins = [
         "https://jihc-lostandfound.web.app",
         "https://jihc-7777.web.app",
@@ -31,6 +25,7 @@ def create_app() -> FastAPI:
     app.add_middleware(CSPMiddleware)
     # Ensure scheme/host are taken from proxy (Railway) so redirects keep HTTPS
     app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
+
 
     app.add_middleware(
         CORSMiddleware,
