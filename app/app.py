@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 # Import the base class for custom middleware
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.proxy_headers import ProxyHeadersMiddleware
 from app.routers import users, auth, chats
 import os
 
@@ -16,7 +17,15 @@ def create_app() -> FastAPI:
     app.include_router(lostandfound.router)
     app.include_router(chats.router)
     env_origins = os.getenv("ALLOWED_ORIGINS", "")
-    origins = ["https://jihc-7777.web.app"]
+
+    origins = [
+        "https://jihc-lostandfound.web.app",
+        "https://jihc-7777.web.app",
+    ]
+    app.add_middleware(CSPMiddleware)
+    # Ensure scheme/host are taken from proxy (Railway) so redirects keep HTTPS
+    app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
+
 
     app.add_middleware(
         CORSMiddleware,
