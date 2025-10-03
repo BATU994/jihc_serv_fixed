@@ -97,7 +97,7 @@ async def update_lostandfound(
     return item
 
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_lostandfound(item_id: str, db: AsyncSession = Depends(sessions.get_async_session)):
+async def delete_lostandfound(item_id: int, db: AsyncSession = Depends(sessions.get_async_session)):
     result = await db.execute(select(LostAndFound).filter(LostAndFound.item_id == item_id))
     item = result.scalar_one_or_none()
     if not item:
