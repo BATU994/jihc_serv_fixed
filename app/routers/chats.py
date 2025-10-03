@@ -8,13 +8,10 @@ from sqlalchemy import or_, select
 
 router = APIRouter(prefix="/chats", tags=["chats"])
 
-# Dependency to get current user (stub, replace with actual)
 def get_current_user():
-    # Replace with actual user retrieval logic
     return 1
 
 async def get_chats_for_user(db: AsyncSession, user_id: int):
-    # Find chats where user_id is present as a distinct token in comma-separated list
     uid = str(user_id)
     result = await db.execute(
         select(DBChat).filter(
@@ -49,12 +46,37 @@ async def get_messages_for_chat(db: AsyncSession, chat_id: int):
     return result.scalars().all()
 
 
-async def create_chat(db: AsyncSession, user_ids: list[int]):
-    # Defensive: ensure exactly two distinct users
+async def create_chat(db: AsyncSession, user_ids: list[int], user_names: list[str], item: str | None, item_image: str | None, item_id: str | None):
     unique_ids = list(dict.fromkeys(user_ids))
     if len(unique_ids) != 2:
-        raise HTTPException(status_code=400, detail="Chat must have exactly two distinct users")
-    chat = DBChat(user_ids=','.join(str(uid) for uid in unique_ids))
+        raise ValueError("user_ids must contain exactly two distinct user ids")
+    normalized = sorted(unique_ids)
+    ids_str = ','.join(map(str, normalized))
+    alt_ids_str = ','.join(map(str, reversed(normalized)))
+    existing_row = await db.execute(
+        select(DBChat).filter(
+            or_(
+                DBChat.user_ids == ids_str,
+                DBChat.user_ids == alt_ids_str
+            )
+        )
+    )
+    existing = existing_row.scalar_one_or_none()
+    if existing:
+        return existing
+
+    if len(user_names) != 2:
+        raise ValueError("user_names must contain exactly two names")
+    input_id_to_name = {int(uid): name for uid, name in zip(user_ids, user_names)}
+    ordered_names = [input_id_to_name[int_id] for int_id in normalized]
+    chat = DBChat(
+        user_ids=ids_str,
+        user_names=','.join(ordered_names),
+        last_message=None,
+        item=item,
+        item_image=item_image,
+        item_id=item_id,
+    )
     db.add(chat)
     await db.commit()
     await db.refresh(chat)
@@ -86,7 +108,6 @@ async def get_chats(db: AsyncSession = Depends(get_async_session), user_id: int 
 @router.get("/user/{user_id}", response_model=List[Chat])
 @router.get("/user/{user_id}/", response_model=List[Chat])
 async def get_chats_by_user(user_id: int, db: AsyncSession = Depends(get_async_session), _: int = Depends(get_current_user)):
-    # Return only chats that include the provided user_id
     return await get_chats_for_user(db, user_id)
 
 @router.get("/{chat_id}/messages", response_model=List[Message])
@@ -105,9 +126,11 @@ async def send_message_endpoint(chat_id: int, message: MessageCreate, db: AsyncS
 @router.post("/", response_model=Chat)
 @router.post("", response_model=Chat)
 async def create_chat_endpoint(chat: ChatCreate, db: AsyncSession = Depends(get_async_session), user_id: int = Depends(get_current_user)):
-    # Accept exactly two distinct user IDs directly
     ids = list(dict.fromkeys(chat.user_ids))
     if len(ids) != 2:
         raise HTTPException(status_code=400, detail="user_ids must contain exactly two distinct user ids")
-    chat_obj = await create_chat(db, ids)
+    try:
+        chat_obj = await create_chat(db, ids, chat.user_names, chat.item, chat.item_image, chat.item_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     return chat_obj

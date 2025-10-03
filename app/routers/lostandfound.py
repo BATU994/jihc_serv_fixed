@@ -26,6 +26,7 @@ async def create_lostandfound(
     desc: str = Form(...),
     date: str = Form(...),
     location: str = Form(...),
+    userName: str = Form(...),
     isResolved: bool = Form(False),
     image: UploadFile = File(None),
     db: AsyncSession = Depends(sessions.get_async_session),
@@ -43,6 +44,7 @@ async def create_lostandfound(
         image_path = f"/static/lostandfound/{filename}"
     item = LostAndFound(
         userId=userId,
+        userName=userName,
         item_name=item_name,
         isLost=isLost,
         desc=desc,

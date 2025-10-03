@@ -16,6 +16,7 @@ class LostAndFound(Base):
     desc = sa.Column(sa.Text, nullable=False)
     date = sa.Column(sa.Text, nullable=False)
     location = sa.Column(sa.Text, nullable=False)
+    userName = sa.Column(sa.Text, nullable=False)
     image = sa.Column(sa.Text, nullable=True)  # store file path
     isResolved = sa.Column(sa.Boolean, nullable=False, server_default=sa.text('0'))
 
@@ -49,10 +50,14 @@ class Users(Base):
 
 
 class Chat(Base):
-    __tablename__ = "chats"
+    __tablename__ = "chats" 
     id = sa.Column(sa.Integer, primary_key=True, index=True)
-    # For simplicity, store user ids as comma-separated string
-    user_ids = sa.Column(sa.Text, nullable=False)  # e.g. "1,2,3"
+    user_ids = sa.Column(sa.Text, nullable=False)
+    user_names = sa.Column(sa.Text, nullable=False)
+    last_message = sa.Column(sa.Text, nullable=True)
+    item = sa.Column(sa.Text, nullable=True)
+    item_image = sa.Column(sa.Text, nullable=True)
+    item_id = sa.Column(sa.Text, nullable=True)
     created_at = sa.Column(sa.DateTime, server_default=sa.func.now(), nullable=False)
 
 
