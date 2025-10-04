@@ -88,7 +88,6 @@ async def update_lostandfound(
         raise HTTPException(status_code=404, detail="Item not found")
 
     data = updated_item.model_dump(exclude_unset=True)
-    # Do not allow changing item_id
     data.pop("item_id", None)
     for key, value in data.items():
         setattr(item, key, value)
