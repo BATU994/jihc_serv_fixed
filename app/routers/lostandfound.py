@@ -104,3 +104,24 @@ async def delete_lostandfound(item_id: str, db: AsyncSession = Depends(sessions.
     await db.delete(item)
     await db.commit()
     return None
+
+@router.patch("/{item_id}", response_model=lostandfound_schema.LostAndFound)
+async def patch_lostandfound(
+    item_id: str,
+    updates: lostandfound_schema.LostAndFoundPartialUpdate,
+    db: AsyncSession = Depends(sessions.get_async_session),
+):
+    result = await db.execute(select(LostAndFound).filter(LostAndFound.item_id == item_id))
+    item = result.scalar_one_or_none()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+
+    data = updates.model_dump(exclude_unset=True, exclude_none=True)
+    if not data:
+        raise HTTPException(status_code=400, detail="No fields provided to update")
+    for key, value in data.items():
+        if hasattr(item, key):
+            setattr(item, key, value)
+    await db.commit()
+    await db.refresh(item)
+    return item

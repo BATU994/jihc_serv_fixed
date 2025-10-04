@@ -16,6 +16,17 @@ class LostAndFoundBase(BaseModel):
 class LostAndFoundCreate(LostAndFoundBase):
     pass
 
+class LostAndFoundPartialUpdate(BaseModel):
+    userId: Optional[int] = None
+    userName: Optional[str] = None
+    item_name: Optional[str] = None
+    isLost: Optional[bool] = None
+    desc: Optional[str] = None
+    date: Optional[str] = None
+    location: Optional[str] = None
+    image: Optional[str] = None  # file path or URL
+    isResolved: Optional[bool] = None
+
 class LostAndFound(LostAndFoundBase):
     id: int
     item_id: str
