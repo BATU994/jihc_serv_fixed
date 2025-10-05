@@ -60,10 +60,10 @@ async def create_lostandfound(
 
 @router.get("/", response_model=list[lostandfound_schema.LostAndFound])
 async def get_all_lostandfound(db: AsyncSession = Depends(sessions.get_async_session)):
-    result = await db.execute(select(LostAndFound))
+    result = await db.execute(select(LostAndFound).filter(LostAndFound.isResolved == False))
     return result.scalars().all()
 
-# Handle no-trailing-slash to avoid proxy redirect loops
+
 @router.get("", response_model=list[lostandfound_schema.LostAndFound])
 async def get_all_lostandfound_no_slash(db: AsyncSession = Depends(sessions.get_async_session)):
     return await get_all_lostandfound(db)

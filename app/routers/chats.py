@@ -134,3 +134,16 @@ async def create_chat_endpoint(chat: ChatCreate, db: AsyncSession = Depends(get_
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     return chat_obj
+
+@router.delete("/{chat_id}", status_code=204)
+async def delete_chat(chat_id: int, db: AsyncSession = Depends(get_async_session), user_id: int = Depends(get_current_user)):
+    result = await db.execute(select(DBChat).filter(DBChat.id == chat_id))
+    chat = result.scalar_one_or_none()
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    user_ids = [int(uid) for uid in chat.user_ids.split(',')]
+    if user_id not in user_ids:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this chat")
+    await db.delete(chat)
+    await db.commit()
+    return None
