@@ -14,7 +14,7 @@ from app.db import sessions
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
 )
-
+    
 reuseable_oauth = OAuth2PasswordBearer(tokenUrl="/auth/login", scheme_name="JWT")
 
 

@@ -16,7 +16,7 @@ def create_app() -> FastAPI:
     app.include_router(lostandfound.router)
     app.include_router(chats.router)
     env_origins = os.getenv("ALLOWED_ORIGINS", "")
-    origins = ["https://jihc-7777.web.app", "http://localhost:49750", "http://localhost:8000"]
+    origins = ["https://jihc-7777.web.app", "http://localhost:51301", "http://localhost:8000", "https://jihc-777.web.app"]
 
     app.add_middleware(
         CORSMiddleware,
