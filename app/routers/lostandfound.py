@@ -125,3 +125,11 @@ async def patch_lostandfound(
     await db.commit()
     await db.refresh(item)
     return item
+
+@router.get("/user/{userId}", response_model=list[lostandfound_schema.LostAndFound])
+async def get_users_items(
+    userId: int,
+    db: AsyncSession = Depends(sessions.get_async_session),
+):
+    result = await db.execute(select(LostAndFound).filter(LostAndFound.userId == userId))
+    return result.scalars().all()
