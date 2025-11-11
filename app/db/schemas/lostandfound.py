@@ -24,7 +24,7 @@ class LostAndFoundPartialUpdate(BaseModel):
     desc: Optional[str] = None
     date: Optional[str] = None
     location: Optional[str] = None
-    image: Optional[str] = None  # file path or URL
+    image: Optional[str] = None 
     isResolved: Optional[bool] = None
 
 class LostAndFound(LostAndFoundBase):

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #messages { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; margin: 10px 0; }
+        #input { width: 70%; padding: 5px; }
+        #sendBtn { padding: 5px 10px; }
+        .message { margin: 5px 0; padding: 5px; background: #f0f0f0; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Chat Test</h1>
+    
+    <div>
+        <label>Chat ID: <input type="number" id="chatId" value="1" /></label>
+        <label>Sender ID: <input type="number" id="senderId" value="123" /></label>
+        <button id="connectBtn">Connect</button>
+        <button id="disconnectBtn">Disconnect</button>
+    </div>
+    
+    <div id="status">Disconnected</div>
+    
+    <div id="messages"></div>
+    
+    <div>
+        <input type="text" id="input" placeholder="Type your message..." />
+        <button id="sendBtn">Send</button>
+    </div>
+
+    <script>
+        let ws = null;
+        const messagesDiv = document.getElementById('messages');
+        const statusDiv = document.getElementById('status');
+        const chatIdInput = document.getElementById('chatId');
+        const senderIdInput = document.getElementById('senderId');
+        const inputField = document.getElementById('input');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const sendBtn = document.getElementById('sendBtn');
+
+        function addMessage(text, className = '') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${className}`;
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function connect() {
+            const chatId = chatIdInput.value;
+            const senderId = senderIdInput.value;
+            
+            if (ws) {
+                ws.close();
+            }
+            
+            // Correct WebSocket URL
+            ws = new WebSocket(`ws://localhost:8000/chats/ws/chat/${chatId}`);
+            
+            ws.onopen = function(event) {
+                statusDiv.textContent = 'Connected';
+                statusDiv.style.color = 'green';
+                addMessage('Connected to chat!', 'info');
+            };
+            
+            ws.onmessage = function(event) {
+                // This is where you get the text from WebSocket
+                const rawText = event.data;
+                console.log('Raw text received:', rawText);
+                
+                try {
+                    const messageData = JSON.parse(rawText);
+                    console.log('Parsed message:', messageData);
+                    
+                    if (messageData.type === "message") {
+                        addMessage(`User ${messageData.sender_id}: ${messageData.content}`);
+                    } else if (messageData.type === "pong") {
+                        addMessage('Pong received', 'info');
+                    } else if (messageData.error) {
+                        addMessage(`Error: ${messageData.error}`, 'error');
+                    }
+                } catch (error) {
+                    addMessage(`Parse error: ${error.message}`, 'error');
+                }
+            };
+            
+            ws.onclose = function(event) {
+                statusDiv.textContent = 'Disconnected';
+                statusDiv.style.color = 'red';
+                addMessage('Connection closed', 'error');
+            };
+            
+            ws.onerror = function(error) {
+                addMessage(`WebSocket error: ${error}`, 'error');
+            };
+        }
+
+        function disconnect() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+        }
+
+        function sendMessage() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const content = inputField.value.trim();
+                const senderId = senderIdInput.value;
+                
+                if (content) {
+                    const message = {
+                        type: "message",
+                        sender_id: parseInt(senderId),
+                        content: content
+                    };
+                    
+                    ws.send(JSON.stringify(message));
+                    inputField.value = '';
+                    addMessage(`You: ${content}`, 'info');
+                }
+            }
+        }
+
+        // Event listeners
+        connectBtn.addEventListener('click', connect);
+        disconnectBtn.addEventListener('click', disconnect);
+        sendBtn.addEventListener('click', sendMessage);
+        
+        inputField.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Send ping every 30 seconds
+        setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: "ping" }));
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

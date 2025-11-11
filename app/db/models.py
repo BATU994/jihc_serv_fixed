@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.sqlite import JSON
 from sqlalchemy.sql.schema import ForeignKey
 from .sessions import Base
 from uuid import uuid4
@@ -23,19 +24,18 @@ class LostAndFound(Base):
 
 class Message(Base):
     __tablename__ = "messages"
-
+    chat_id = sa.Column(sa.Integer, sa.ForeignKey("chats.id"), nullable=False)
     id = sa.Column(sa.Integer, primary_key=True, index=True)
     sender_id = sa.Column(sa.Integer, sa.ForeignKey("users.id"), nullable=False)
     receiver_id = sa.Column(sa.Integer, sa.ForeignKey("users.id"), nullable=False)
     content = sa.Column(sa.Text, nullable=False)
     timestamp = sa.Column(sa.DateTime, server_default=sa.func.now(), nullable=False)
-
     sender = relationship("Users", foreign_keys=[sender_id], backref="sent_messages")
     receiver = relationship("Users", foreign_keys=[receiver_id], backref="received_messages")
 
 
 
-class Users(Base):
+class Users(Base):  
     __tablename__ = "users"
 
     id = sa.Column(sa.Integer, primary_key=True, index=True)
@@ -52,8 +52,8 @@ class Users(Base):
 class Chat(Base):
     __tablename__ = "chats" 
     id = sa.Column(sa.Integer, primary_key=True, index=True)
-    user_ids = sa.Column(sa.Text, nullable=False)
-    user_names = sa.Column(sa.Text, nullable=False)
+    user_ids = sa.Column(sa.JSON, nullable=False)
+    user_names = sa.Column(sa.JSON, nullable=False)
     last_message = sa.Column(sa.Text, nullable=True)
     item = sa.Column(sa.Text, nullable=True)
     item_image = sa.Column(sa.Text, nullable=True)

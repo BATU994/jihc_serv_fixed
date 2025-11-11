@@ -23,7 +23,6 @@ async def register_user(
     payload: user_schemas.UsersCreate,
     db: AsyncSession = Depends(sessions.get_async_session),
 ) -> str:
-    # querying database to check if user already exist
     q = await db.scalars(select(Users).filter(Users.email == payload.email))
     user = q.first()
 
@@ -83,3 +82,29 @@ async def login(
         "email": user.email,
         "group": user.group
     }
+
+
+
+@router.put("/edit/{user_id}", summary="Edit user details")
+async def edit_user(
+    user_id: int,
+    updated_user: user_schemas.UserUpdate,
+    db: AsyncSession = Depends(sessions.get_async_session),
+):
+    result = await db.execute(select(Users).filter(Users.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    data = updated_user.model_dump(exclude_unset=True)
+
+    if "password" in data:
+        hashed_pw = get_password_hash(data["password"].encode("utf-8"))
+        data["password"] = hashed_pw
+
+    for key, value in data.items():
+        setattr(user, key, value)
+
+    await db.commit()
+    await db.refresh(user)
+    return {"message": "User updated successfully"}
