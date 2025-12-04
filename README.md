@@ -1,4 +1,4 @@
-# Fastapi Template
+# JIHC Lost & Found API
 
 A basic template to help kickstart development of a Fastapi based API. ideal for ideating and POCs, ready to grow with you. This template is completely front-end independent
 and leaves all related decisions up to the developer.
