@@ -23,25 +23,6 @@ The `posts` part is responsible for handeling all requests related to adding, re
 
 The `auth` part is responsible for handeling user registration and login. The login is Oauth2 based and uses JWTs.
 
-## Installation
-
-### Template and Dependencies
-
-* Clone this repository:
-
- ```zsh
- git clone https://github.com/StefanVDWeide/fastapi-api-template.git
- ```
-
-### Virtual Environment Setup
-
-It is preferred to create a virtual environment per project, rather then installing all dependencies of each of your
-projects system wide. Once you install [virtual env](https://virtualenv.pypa.io/en/stable/installation/), and move to
-your projects directory through your terminal, you can set up a virtual env with:
-
-```bash
-python3 -m venv .venv
-```
 
 ### Dependency installations
 
